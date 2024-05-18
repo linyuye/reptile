@@ -17,6 +17,8 @@ import json
 import datetime
 from fake_useragent import UserAgent
 import random
+from bilibili_api import video
+
 
 # 重试次数限制
 MAX_RETRIES = 5
@@ -36,7 +38,10 @@ ua=UserAgent()#创立随机请求头
 
 """
 在这里修改你爬取页码的参数，取消注释
-oid= 315941005
+bvid= '这里写视频BV'
+#动态的话用F12看Network fetch/XRR这一栏里面的开头为main的数据
+#把那个oid复制到下面
+oid = video.Video(bvid=bvid).get_aid()
 type= 11 # 类型 11个人动态 17转发动态 视频1）
 ps= 20 # (每页含有条数，不能大于20)
 """
