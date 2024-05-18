@@ -8,23 +8,24 @@
 
 ## QuickStart
 
-0. 配置参数
+首先将 `.env.example` 重命名为 `.env` 文件，否则无法读取参数
 
-打开你想要运行的脚本文件，阅读注释，填写必要的参数。
+然后打开 `.env` 配置参数即可。核心参数如下：
+1. BVID: B站视频的BV号，获取方法在 README 下放可见
+2. TUNNEL：代理地址。此处需要你自己找代理地址。（默认可不使用）
+3. USER_NAME、PASSWORD：如果开启代理，此处需要填写你自己的账号密码。如果不开启代理，则不需要填
+4. PS: 爬虫爬取评论区的页数，默认20（不能大于20）
+5. DOWN + UP：DOWN是开始爬取的页数，UP是结束爬取的页数
+   1. DOWN=1, UP=20: 从第1页开始爬取到第20页
 
-1. 启动命令行
+配置完成后。如果是第一次执行，首先得打开终端，执行 `pip install -r requirements.txt` 命令安装依赖
 
-2. 安装必要依赖
-```
-pip install -r requirments.txt
-```
+等一切配置完成后，执行 `python 基于懒加载api实现的无限爬取bilibili评论区.py` 命令。即可开始爬取数据
 
 
-
-3. 执行脚本
-```
-python <脚本名词>.py
-```
+如果想要爬取更多数据，则更新 `.env` 中 DOWN 和 UP 即可。
+- 第一次 DOWN=1 UP=20。则第二次 DOWN=21 UP=40
+- 不建议一次性爬取过多数据，有概率会被B站封禁。最好一点一点地爬取。
 
 ### 关于 BV 号的说明
 
@@ -34,8 +35,3 @@ BV 号在 B站 视频链接处就可以获取：
 - 举个栗子：https://www.bilibili.com/video/BV1v14y1z7MV/?spm_id_from=333.337.search-card.all.click&vd_source=8520816864b1bef4ba13ba9c706bce41
 - BV号就是 video/ 后面跟着的一组大小写+数字的参数。
 - 复制 BV 号，填入 bvid 即可
-
-
-## TODO
-
-脚本很多参数都是硬编码在程序之中的，希望后续可以在运行期间自行输入，方便小白使用
