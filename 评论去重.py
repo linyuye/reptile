@@ -8,4 +8,4 @@ cols_to_check = ['昵称', '时间', '评论']
 unique_df = df.drop_duplicates(subset=cols_to_check, keep='first')
 
 # 将结果保存到新的CSV文件
-unique_df.to_csv('123456.csv', index=False, encoding='utf-8-sig')
+unique_df.to_csv('xxxxxx.csv', index=False, encoding='utf-8-sig')
