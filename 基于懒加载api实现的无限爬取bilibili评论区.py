@@ -146,7 +146,7 @@ with requests.Session() as session:
                                     mid = comment['member']['mid']
                                     all_comments.append([name, sex, formatted_time, like, message, location,count,current_level,mid])
                                     comments_current.append([name, sex, formatted_time, like, message, location, count, current_level,mid])
-                                    with open('木木4.0w及时保存.csv', mode='a', newline='', encoding='utf-8-sig') as file:
+                                    with open(bvid + '视频评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:
                                         writer = csv.writer(file)
                                         writer.writerows(comments_current)
                                     comments_current.clear()
@@ -192,7 +192,7 @@ with requests.Session() as session:
                                                         all_2_comments.append([name, sex, formatted_time, like, message, location, count,current_level,rpid,mid ])
                                                         comments_current_2.append([name, sex, formatted_time, like, message, location, count,current_level,mid ])
 
-                                                        with open('木木4.0w及时保存子评论.csv', mode='a', newline='',
+                                                        with open(bvid + '视频子评论.csv', mode='a', newline='',
                                                                   encoding='utf-8-sig') as file:
                                                             writer = csv.writer(file)
 
@@ -225,13 +225,13 @@ with requests.Session() as session:
                     raise  # 如果达到最大重试次数，则抛出原始异常
 
         # 将所有评论数据写入CSV文件
-with open('木木4.0w.csv', mode='a', newline='', encoding='utf-8-sig') as file:
+with open(bvid + '视频评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:
     writer = csv.writer(file)
         # 写入表头
     writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数','等级','uid'])
         # 写入所有评论数据
     writer.writerows(all_comments)
-with open('木木4.0w_2.csv', mode='a', newline='', encoding='utf-8-sig') as file:#二级评论条数
+with open(bvid + '视频评论2.csv', mode='a', newline='', encoding='utf-8-sig') as file:#二级评论条数
     writer = csv.writer(file)
     writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数,条数相同说明在同一个人下面','等级','根id','uid'])
     writer.writerows(all_2_comments)
