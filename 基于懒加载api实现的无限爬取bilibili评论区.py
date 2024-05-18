@@ -4,6 +4,8 @@
 # 作者：林宇叶 2024/5/17
 # 本软件仅限于个人学习使用，请在下载后的24小时内删除
 # 使用内容时，请遵守网站robots守则，不要对网站进行破坏性挖掘
+
+import os
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -18,65 +20,52 @@ import datetime
 from fake_useragent import UserAgent
 import random
 from bilibili_api import video
+from dotenv import load_dotenv
+
+# 加载.env全局变量
+load_dotenv()
 
 
 # 重试次数限制
 MAX_RETRIES = 5
 # 重试间隔（秒）
 RETRY_INTERVAL = 10
-"""
+
+
 # 用户名密码方式
-username = ""
-password = ""
-tunnel = ""
+username = os.getenv("USER_NAME") if os.getenv("USER_NAME") is not None else ""
+password = os.getenv("PASSWORD") if os.getenv("PASSWORD") is not None else  ""
+
 #基于代理ip网站，给24小时试用
 #代理ip来源：https://www.kuaidaili.com/free/inha/
 #不用也行
+tunnel = os.getenv("TUNNEL") if os.getenv("TUNNEL") is not None else ""
+useProxy = False
+if tunnel is None:
+    useProxy = True
+
+# 其他参数
 beijing_tz = pytz.timezone('Asia/Shanghai')#时间戳转换为北京时间
 ua=UserAgent()#创立随机请求头
-"""
 
-"""
-在这里修改你爬取页码的参数，取消注释
-bvid= '这里写视频BV'
-#动态的话用F12看Network fetch/XRR这一栏里面的开头为main的数据
-#把那个oid复制到下面
+
+# 爬虫参数配置
+bvid= os.getenv("BVID")
 oid = video.Video(bvid=bvid).get_aid()
-type= 11 # 类型 11个人动态 17转发动态 视频1）
-ps= 20 # (每页含有条数，不能大于20)
-"""
-# 1	视频稿件	稿件 avid
-# 2	话题	话题 id
-# 4	活动	活动 id
-# 5	小视频	小视频 id
-# 6	小黑屋封禁信息	封禁公示 id
-# 7	公告信息	公告 id
-# 8	直播活动	直播间 id
-# 9	活动稿件	(?)
-# 10	直播公告	(?)
-# 11	相簿（图片动态）	相簿 id
-# 12	专栏	专栏 cvid
-# 13	票务	(?)
-# 14	音频	音频 auid
-# 15	风纪委员会	众裁项目 id
-# 16	点评	(?)
-# 17	动态（纯文字动态&分享）	动态 id
-# 18	播单	(?)
-# 19	音乐播单	(?)
-# 20	漫画	(?)
-# 21	漫画	(?)
-# 22	漫画	漫画 mcid
-# 33	课程	课程 epid
-"""
-在这里修改你爬取页码的范围，取消注释
-down = 1 #开始爬的页数
-up = 1000#结束爬的页数
-"""
+type= os.getenv("TYPE")
+ps= os.getenv("PS")
+
+# 评论区分页参数
+down = int(os.getenv("DOWN"))
+up = int(os.getenv("UP"))
+
+
 one_comments = []
 all_comments = []#构造数据放在一起的容器  总共评论，如果只希望含有一级评论，请注释 line 144
 all_2_comments = []#构造数据放在一起的容器 二级评论
 comments_current = []
 comments_current_2 = []
+
 with requests.Session() as session:
     retries = Retry(total=3,  # 最大重试次数，好像没有这个函数
                     backoff_factor=0.1,  # 间隔时间会乘以这个数
@@ -91,33 +80,34 @@ with requests.Session() as session:
                 'SESSDATA': "",
                 'csrf' : "",
                 }
+
                 url =      'https://api.bilibili.com/x/v2/reply?'#正常api，只能爬8k
                 url_long = 'https://api.bilibili.com/x/v2/reply/main'#懒加载api，理论无上限
                 url_reply = 'https://api.bilibili.com/x/v2/reply/reply'#评论区回复api
                 #示例：https://api.bilibili.com/x/v2/reply/main?next=1&type=1&oid=544588138&mode=3（可访问网站）
                 data = {
-                #其余没写懒加载api的均为正常api
-                'next':str(page),  # 页数，需要转换为字符串，与pn同理，使用懒加载api
-                #'pn': str(page),  # 页数，需要转换为字符串
-                'type': type,  # 类型 11个人动态 17转发动态 视频1）
-                'oid': oid,  #id，视频为av，文字动态地址栏id，可自查
-                'ps': ps, #(每页含有条数，不能大于20)用long的话不能大于30
-                #'sort': '0'  # 排序方式，0最新（即查看时间排序），1历史（看最先发言的），2为热度 34没发现有什么用
-                'mode': '3'  #3为热度       0 3：仅按热度      1：按热度+按时间 2：仅按时间 使用懒加载api
-                    #3最稳定
-                #
-                #mid =  uid 想查询某个人发言看这个mid
-                #count 二级评论所含有的数量 > 0对其构造二级评论
-                #pn 二级评论页数，需要转换为字符串
+                    #其余没写懒加载api的均为正常api
+                    'next':str(page),  # 页数，需要转换为字符串，与pn同理，使用懒加载api
+                    #'pn': str(page),  # 页数，需要转换为字符串
+                    'type': type,  # 类型 11个人动态 17转发动态 视频1）
+                    'oid': oid,  #id，视频为av，文字动态地址栏id，可自查
+                    'ps': ps, #(每页含有条数，不能大于20)用long的话不能大于30
+                    #'sort': '0'  # 排序方式，0最新（即查看时间排序），1历史（看最先发言的），2为热度 34没发现有什么用
+                    'mode': '3'  #3为热度       0 3：仅按热度      1：按热度+按时间 2：仅按时间 使用懒加载api
+                        #3最稳定
+                    #
+                    #mid =  uid 想查询某个人发言看这个mid
+                    #count 二级评论所含有的数量 > 0对其构造二级评论
+                    #pn 二级评论页数，需要转换为字符串
                 }
-                """
+
+
+                #代理ip来源：https://www.kuaidaili.com/free/inha/
                 proxies = {
-                     #"http": "http://%(user)s:%(pwd)s@%(proxy)s/" % {"user": username, "pwd": password, "proxy": tunnel},
-                     #"https": "http://%(user)s:%(pwd)s@%(proxy)s/" % {"user": username, "pwd": password, "proxy": tunnel}
-                      #代理ip来源：https://www.kuaidaili.com/free/inha/
+                    "http": "http://%(user)s:%(pwd)s@%(proxy)s/" % {"user": username, "pwd": password, "proxy": tunnel},
+                    "https": "http://%(user)s:%(pwd)s@%(proxy)s/" % {"user": username, "pwd": password, "proxy": tunnel}
                 }
-                可以不用代理
-                """
+
                 prep = session.prepare_request(requests.Request('GET', url_long, params=data, headers=headers))
                 print(prep.url)
                 response = session.get(url_long, params=data, headers=headers)
@@ -166,7 +156,12 @@ with requests.Session() as session:
                                             }
                                             if page_pn == 0:
                                                 continue
-                                            response = session.get(url_reply, params=data_2, headers=headers, proxies=proxies)
+
+                                            # 判断是否启用代理
+                                            if useProxy:
+                                                response = session.get(url_reply, params=data_2, headers=headers, proxies=proxies)
+                                            response = session.get(url_reply, params=data_2, headers=headers)
+
                                             prep = session.prepare_request(requests.Request('GET', url_reply, params=data_2, headers=headers))
                                             print(prep.url)
 
@@ -224,14 +219,4 @@ with requests.Session() as session:
                 else:
                     raise  # 如果达到最大重试次数，则抛出原始异常
 
-        # 将所有评论数据写入CSV文件
-with open(bvid + '视频评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:
-    writer = csv.writer(file)
-        # 写入表头
-    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数','等级','uid'])
-        # 写入所有评论数据
-    writer.writerows(all_comments)
-with open(bvid + '视频评论2.csv', mode='a', newline='', encoding='utf-8-sig') as file:#二级评论条数
-    writer = csv.writer(file)
-    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数,条数相同说明在同一个人下面','等级','根id','uid'])
-    writer.writerows(all_2_comments)
+
