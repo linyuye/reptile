@@ -61,10 +61,17 @@ up = int(os.getenv("UP"))
 
 
 one_comments = []
-all_comments = []#构造数据放在一起的容器  总共评论，如果只希望含有一级评论，请注释 line 144
+all_comments = []#构造数据放在一起的容器  总共评论
 all_2_comments = []#构造数据放在一起的容器 二级评论
 comments_current = []
 comments_current_2 = []
+
+with open(bvid + '视频评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:
+    writer = csv.writer(file)
+    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数','等级','uid'])
+with open(bvid + '视频子评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:#二级评论条数
+    writer = csv.writer(file)
+    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数,条数相同说明在同一个人下面','等级','根id','uid'])
 
 with requests.Session() as session:
     retries = Retry(total=3,  # 最大重试次数，好像没有这个函数
@@ -218,5 +225,6 @@ with requests.Session() as session:
                     time.sleep(RETRY_INTERVAL)  # 等待一段时间后重试
                 else:
                     raise  # 如果达到最大重试次数，则抛出原始异常
+
 
 
