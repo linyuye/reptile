@@ -1,5 +1,5 @@
 import pandas as pd
-
+#使用前把评论和子评论集放在同一个csv中，记得改csv的uid和rpid格式，不然会科学计数法导致失败
 # 读取CSV文件
 df = pd.read_csv('xxxxxxxxxxxxxxx.csv', dtype={'rpid': str})
 cols_to_check = ['昵称', '时间', '评论']
