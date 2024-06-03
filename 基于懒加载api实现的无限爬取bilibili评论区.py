@@ -68,16 +68,17 @@ comments_current_2 = []
 
 with open(bvid + '视频评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:
     writer = csv.writer(file)
-    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数','等级','uid'])
+    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数','等级','uid','rpid'])
 with open(bvid + '视频子评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:#二级评论条数
     writer = csv.writer(file)
-    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数,条数相同说明在同一个人下面','等级','根id','uid'])
+    writer.writerow(['昵称', '性别', '时间', '点赞', '评论', 'IP属地','二级评论条数,条数相同说明在同一个人下面','等级','uid','rpid'])
 
 with requests.Session() as session:
     retries = Retry(total=3,  # 最大重试次数，好像没有这个函数
                     backoff_factor=0.1,  # 间隔时间会乘以这个数
                     status_forcelist=[500, 502, 503, 504])
 
+    
     for page in range(down, up + 1):
         for retry in range(MAX_RETRIES):
             try:
@@ -128,7 +129,7 @@ with requests.Session() as session:
                                     rpid = comment['rpid']
                                     name = comment['member']['uname']
                                     sex = comment['member']['sex']
-
+                                    
                                     ctime = comment['ctime']
                                     # 使用datetime.fromtimestamp和datetime.timezone.utc来创建UTC时间的datetime对象
                                     dt_object = datetime.datetime.fromtimestamp(ctime, datetime.timezone.utc)
@@ -141,8 +142,9 @@ with requests.Session() as session:
                                     # 将提取的信息追加到列表中
                                     current_level = comment['member']['level_info']['current_level']
                                     mid = comment['member']['mid']
-                                    all_comments.append([name, sex, formatted_time, like, message, location,count,current_level,mid])
-                                    comments_current.append([name, sex, formatted_time, like, message, location, count, current_level,mid])
+                                    all_comments.append([name, sex, formatted_time, like, message, location,count,current_level,mid,rpid])
+                                    comments_current.append([name, sex, formatted_time, like, message, location, count, current_level,mid,rpid])
+
                                     with open(bvid + '视频评论.csv', mode='a', newline='', encoding='utf-8-sig') as file:
                                         writer = csv.writer(file)
                                         writer.writerows(comments_current)
@@ -179,6 +181,7 @@ with requests.Session() as session:
                                                         print(f"该页replies为空，没有评论")
                                                         continue
                                                     for comment in json_data['data']['replies']:
+                                                        rpid = str(comment['rpid'])
                                                         name = comment['member']['uname']
                                                         sex = comment['member']['sex']
                                                         ctime = comment['ctime']
@@ -191,8 +194,8 @@ with requests.Session() as session:
                                                         location = location.replace('IP属地：', '') if location else location
                                                         current_level = comment['member']['level_info']['current_level']
                                                         mid = comment['member']['mid']
-                                                        all_2_comments.append([name, sex, formatted_time, like, message, location, count,current_level,rpid,mid ])
-                                                        comments_current_2.append([name, sex, formatted_time, like, message, location, count,current_level,mid ])
+                                                        all_2_comments.append([name, sex, formatted_time, like, message, location, count,current_level,mid,rpid])
+                                                        comments_current_2.append([name, sex, formatted_time, like, message, location, count,current_level,mid,rpid])
 
                                                         with open(bvid + '视频子评论.csv', mode='a', newline='',
                                                                   encoding='utf-8-sig') as file:
