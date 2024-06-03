@@ -1,3 +1,4 @@
 requests
 bilibili_api
 python-dotenv
+bilibili-api-python
