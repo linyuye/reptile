@@ -1,5 +1,5 @@
 # Reptile 基于bilibili懒加载api爬取b站动态，视频等评论区
-# 务必仔细观看以下内容！！！
+# 本项目暂停更新，请移步新的仓库https://github.com/linyuye/Bilibili_crawler
 
 基于bilibili懒加载api爬取b站动态，视频等评论区。
 动态评论，视频评论均能爬取。
